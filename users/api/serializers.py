@@ -57,11 +57,8 @@ class LoginSerializer(serializers.ModelSerializer):
         if not user:
             raise exceptions.AuthenticationFailed("invalide username or password")
         try:
-
             user_token = get_tokens_for_user(user)
-            print('token', user_token)
             return {
-                # "username_or_email": user,
                 "access_token": str(user_token.get("access")),
                 "refresh_token": str(user_token.get("refresh"))
             }

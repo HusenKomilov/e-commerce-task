@@ -3,7 +3,6 @@ from django.db import models
 from utils.models import BaseModel
 from users import managers
 from rest_framework_simplejwt.tokens import RefreshToken
-from products.models import Product
 
 USER = "user"
 ADMIN = 'admin'
@@ -43,16 +42,15 @@ class User(AbstractUser):
             "access_token": str(refresh.access_token)
         }
 
-
-class Customer(BaseModel):
-    user = models.OneToOneField(User, on_delete=models.CASCADE, related_name="user_profile")
-    first_name = models.CharField(max_length=128)
-    last_name = models.CharField(max_length=128)
-
-    image = models.ImageField(upload_to="profile", blank=True, null=True)
-
-    def __str__(self):
-        return self.first_name
+# class Customer(BaseModel):
+#     user = models.OneToOneField(User, on_delete=models.CASCADE, related_name="user_profile")
+#     first_name = models.CharField(max_length=128)
+#     last_name = models.CharField(max_length=128)
+#
+#     image = models.ImageField(upload_to="profile", blank=True, null=True)
+#
+#     def __str__(self):
+#         return self.first_name
 
 
 # class Card(BaseModel):
