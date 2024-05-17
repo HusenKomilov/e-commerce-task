@@ -1,26 +1,42 @@
-from django.contrib.auth.models import AbstractUser
-from django.db.models import CharField
-from django.urls import reverse
-from django.utils.translation import gettext_lazy as _
+from django.contrib.auth.models import AbstractBaseUser, PermissionsMixin, AbstractUser
+from django.db import models
+from utils.models import BaseModel
+from users import managers, choices
+from rest_framework_simplejwt.tokens import RefreshToken
 
+USER = "user"
+ADMIN = 'admin'
+ROLES = [
+    (ADMIN , "admin"),
+    (USER, 'user')
+]
 
 class User(AbstractUser):
-    """
-    Default custom user model for My Awesome Project.
-    If adding fields that need to be filled at user signup,
-    check forms.SignupForm and forms.SocialSignupForms accordingly.
-    """
+    name = models.CharField(max_length=128)
+    username = models.CharField(max_length=128, unique=True)
+    role = models.CharField(max_length=128, choices=ROLES, default=USER)
+    email = models.EmailField(unique=True)
 
-    # First and last name do not cover name patterns around the globe
-    name = CharField(_("Name of User"), blank=True, max_length=255)
-    first_name = None  # type: ignore
-    last_name = None  # type: ignore
+    is_staff = models.BooleanField(default=False)
+    is_superuser = models.BooleanField(default=False)
+    is_verified = models.BooleanField(default=False)
+    is_active = models.BooleanField(default=True)
 
-    def get_absolute_url(self) -> str:
-        """Get URL for user's detail view.
+    date_joined = models.DateTimeField(auto_now_add=True)
+    last_login = models.DateTimeField(auto_now=True)
 
-        Returns:
-            str: URL for user detail.
+    USERNAME_FIELD = "email"
 
-        """
-        return reverse("users:detail", kwargs={"username": self.username})
+    REQUIRED_FIELDS = ["name", "username", ]
+
+    objects = managers.UserManager()
+
+    def __str__(self):
+        return self.username
+
+    def tokens(self):
+        refresh = RefreshToken.for_user(self)
+        return {
+            "refresh": str(refresh),
+            "access_token": str(refresh.access_token)
+        }
