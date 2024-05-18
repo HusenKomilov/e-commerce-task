@@ -1,6 +1,6 @@
 from django.db import models
 from utils.models import BaseModel
-from users.models import User
+from users.models import Customer
 
 
 class Category(BaseModel):
@@ -14,8 +14,9 @@ class Category(BaseModel):
 
 class Product(BaseModel):
     title = models.CharField(max_length=128)
-    slug = models.SlugField(unique=True)
+    slug = models.SlugField(unique=True, null=True)
     description = models.TextField()
+    color = models.CharField(max_length=128)
 
     width = models.IntegerField()
     height = models.IntegerField()
@@ -29,16 +30,9 @@ class Product(BaseModel):
     is_new = models.BooleanField(default=False)
     is_hot = models.BooleanField(default=False)
 
-    category = models.ManyToManyField(Category, related_name="categories")
+    main_image = models.ImageField(upload_to="product/", blank=True, null=True)
 
-    def get_first_photo(self):
-        if self.images:
-            try:
-                return self.images.first()
-            except:
-                return "-"
-        else:
-            return "-"
+    category = models.ManyToManyField(Category, related_name="categories")
 
     def __str__(self):
         return self.title
@@ -51,16 +45,16 @@ class Gallery(BaseModel):
 
 class Review(BaseModel):
     description = models.TextField()
-    user = models.ForeignKey(User, on_delete=models.CASCADE, related_name="author_review")
+    user = models.ForeignKey(Customer, on_delete=models.CASCADE, related_name="author_review")
     product = models.ForeignKey(Product, on_delete=models.CASCADE, related_name="product")
 
     def __str__(self):
-        return self.user.username
+        return self.user.user.username
 
 
 class FavouriteProducts(BaseModel):
     product = models.ForeignKey(Product, on_delete=models.CASCADE, related_name="like")
-    user = models.ForeignKey(User, on_delete=models.CASCADE, related_name="user")
+    user = models.ForeignKey(Customer, on_delete=models.CASCADE, related_name="customer_like")
 
     def __str__(self):
         return self.product.title

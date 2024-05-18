@@ -1,9 +1,7 @@
 from django.contrib.auth import get_user_model, authenticate
 from rest_framework import serializers, exceptions
-# from rest_framework.authentication import
-
-from users.models import User
 from rest_framework_simplejwt.tokens import RefreshToken
+from users.models import User, Customer
 
 
 def get_tokens_for_user(user):
@@ -69,8 +67,22 @@ class LoginSerializer(serializers.ModelSerializer):
 class UserSerializer(serializers.ModelSerializer):
     class Meta:
         model = User
-        fields = ["username", "name", "url"]
+        fields = ["username", "name", "email", "url"]
 
         extra_kwargs = {
             "url": {"view_name": "api:user-detail", "lookup_field": "username"},
         }
+
+
+class CustomerSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Customer
+        fields = ("user", "image")
+
+
+class ProfileSerializer(serializers.ModelSerializer):
+    user = UserSerializer()
+
+    class Meta:
+        model = Customer
+        fields = ("user", "first_name", "last_name", "image")

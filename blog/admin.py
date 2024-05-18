@@ -15,7 +15,6 @@ class PostAdmin(admin.ModelAdmin):
     inlines = [PostGallery]
 
     def get_photo(self, obj):
-        print(obj.main_photo)
         if obj.main_photo:
             try:
                 return mark_safe(f"<img src='{obj.main_photo.url}' width='75'>")

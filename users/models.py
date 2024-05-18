@@ -42,20 +42,14 @@ class User(AbstractUser):
             "access_token": str(refresh.access_token)
         }
 
-# class Customer(BaseModel):
-#     user = models.OneToOneField(User, on_delete=models.CASCADE, related_name="user_profile")
-#     first_name = models.CharField(max_length=128)
-#     last_name = models.CharField(max_length=128)
-#
-#     image = models.ImageField(upload_to="profile", blank=True, null=True)
-#
-#     def __str__(self):
-#         return self.first_name
 
+class Customer(BaseModel):
+    user = models.OneToOneField(User, on_delete=models.CASCADE, related_name="user_profile")
+    first_name = models.CharField(max_length=128, default=None, null=True, blank=True)
+    last_name = models.CharField(max_length=128, default=None, null=True, blank=True)
 
-# class Card(BaseModel):
-#     product = models.ForeignKey(Product, on_delete=models.CASCADE)
-#     user = models.ForeignKey(Customer, on_delete=models.CASCADE)
-#     quantity = models.IntegerField(default=1)
-#     total_price = models.DecimalField(max_digits=12, decimal_places=2)
-#
+    image = models.ImageField(upload_to="profile", blank=True, null=True)
+
+    def __str__(self):
+        return self.user.username
+

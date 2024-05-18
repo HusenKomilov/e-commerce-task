@@ -5,7 +5,7 @@ from django.contrib.auth import decorators, get_user_model
 from django.utils.translation import gettext_lazy as _
 
 from users.forms import UserAdminChangeForm, UserAdminCreationForm
-from users.models import User
+from users import models
 
 # admin.site.register(User)
 
@@ -42,3 +42,6 @@ class UserAdmin(auth_admin.UserAdmin):
     list_display = ["username", "name", "is_superuser", "role",]
     search_fields = ["name"]
     readonly_fields = ["last_login", "date_joined"]
+
+
+admin.site.register(models.Customer)

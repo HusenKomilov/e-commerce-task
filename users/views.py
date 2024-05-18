@@ -4,12 +4,13 @@ from django.contrib.messages.views import SuccessMessageMixin
 from django.urls import reverse
 from django.utils.translation import gettext_lazy as _
 from django.views.generic import DetailView, RedirectView, UpdateView
+from users.models import Customer
 
 User = get_user_model()
 
 
 class UserDetailView(LoginRequiredMixin, DetailView):
-    model = User
+    model = Customer
     slug_field = "username"
     slug_url_kwarg = "username"
 

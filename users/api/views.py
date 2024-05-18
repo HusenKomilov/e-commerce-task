@@ -4,10 +4,12 @@ from rest_framework.decorators import action
 from rest_framework.mixins import ListModelMixin, RetrieveModelMixin, UpdateModelMixin
 from rest_framework.response import Response
 from rest_framework.viewsets import GenericViewSet
-from rest_framework.generics import GenericAPIView
+# from rest_framework import GenericAPIView, RetrieveUpdateAPIView, ListCreateAPIView
+from rest_framework import generics
 from rest_framework.views import APIView
 from rest_framework.permissions import IsAuthenticated
 from rest_framework_simplejwt.tokens import RefreshToken
+from users import models
 
 from users.api import serializers
 
@@ -31,17 +33,6 @@ class RegistrationAPIView(APIView):
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
 
-class LoginAPIView(GenericAPIView):
-    serializer_class = serializers.LoginSerializer
-
-    def post(self, request):
-        serializer = serializers.LoginSerializer(data=request.data, context={'request': request})
-        if serializer.is_valid():
-            return Response(serializer.data, status=status.HTTP_200_OK)
-
-        return Response(serializer.errors)
-
-
 def get_tokens_for_user(user):
     refresh = RefreshToken.for_user(user)
     return {
@@ -50,7 +41,7 @@ def get_tokens_for_user(user):
     }
 
 
-class TestLoginApiView(APIView):
+class LoginApiView(APIView):
 
     def post(self, request):
 
@@ -82,19 +73,18 @@ class TestLoginApiView(APIView):
             raise e
 
 
-class Profile(GenericAPIView):
+class Profile(generics.RetrieveUpdateAPIView):
+    queryset = models.Customer.objects.all()
+    serializer_class = serializers.ProfileSerializer
     permission_classes = [IsAuthenticated]
 
-    def get(self, request):
-        data = {
-            "msg": "ist worker"
-        }
-        return Response(data, status=status.HTTP_200_OK)
+    def get_object(self, request):
+        return request.user
 
 
 class UserViewSet(RetrieveModelMixin, ListModelMixin, UpdateModelMixin, GenericViewSet):
-    serializer_class = serializers.UserSerializer
-    queryset = User.objects.all()
+    serializer_class = serializers.CustomerSerializer
+    queryset = models.Customer.objects.all()
     lookup_field = "username"
 
     def get_queryset(self, *args, **kwargs):
@@ -105,3 +95,4 @@ class UserViewSet(RetrieveModelMixin, ListModelMixin, UpdateModelMixin, GenericV
     def me(self, request):
         serializer = serializers.UserSerializer(request.user, context={"request": request})
         return Response(status=status.HTTP_200_OK, data=serializer.data)
+
